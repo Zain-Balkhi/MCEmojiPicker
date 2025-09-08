@@ -37,6 +37,10 @@ protocol MCEmojiPickerViewDelegate: AnyObject {
     func getEmojiPickerFrame() -> CGRect
     func updateEmojiSkinTone(_ skinToneRawValue: Int, in indexPath: IndexPath)
     func feedbackImpactOccurred()
+    /// Handles search text changes.
+    func didUpdateSearchText(_ text: String)
+    /// Handles search state changes.
+    func didChangeSearchState(_ isSearching: Bool)
 }
 
 final class MCEmojiPickerView: UIView {
@@ -63,6 +67,9 @@ final class MCEmojiPickerView: UIView {
             light: UIColor(red: 0.78, green: 0.78, blue: 0.78, alpha: 1.0),
             dark: UIColor(red: 0.22, green: 0.22, blue: 0.23, alpha: 1.0)
         )
+        
+        static let searchBarHeight = 44.0
+        static let searchBarInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
     }
     
     // MARK: - Private Properties
@@ -95,6 +102,17 @@ final class MCEmojiPickerView: UIView {
         stackView.backgroundColor = .popoverBackgroundColor
         stackView.distribution = .fillEqually
         return stackView
+    }()
+    
+    private let searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        searchBar.placeholder = "Search emojis"
+        searchBar.searchBarStyle = .minimal
+        searchBar.backgroundColor = .clear
+        searchBar.backgroundImage = UIImage()
+        searchBar.tintColor = .systemBlue
+        return searchBar
     }()
     
     private var previewContainerView = UIView()
@@ -143,6 +161,21 @@ final class MCEmojiPickerView: UIView {
         })
     }
     
+    /// Updates the search state and shows/hides category controls accordingly.
+    ///
+    /// - Parameter isSearching: Whether the picker is in search mode.
+    public func updateSearchState(_ isSearching: Bool) {
+        categoriesStackView.isHidden = isSearching
+        collectionView.reloadData()
+    }
+    
+    /// Updates the search text in the search bar.
+    ///
+    /// - Parameter text: The search text to display.
+    public func updateSearchText(_ text: String) {
+        searchBar.text = text
+    }
+    
     // MARK: - Private Methods
     
     private func setupBackgroundColor() {
@@ -152,6 +185,7 @@ final class MCEmojiPickerView: UIView {
     private func setupDelegates() {
         collectionView.delegate = self
         collectionView.dataSource = self
+        searchBar.delegate = self
     }
     
     private func setupCollectionViewBottomInsets() {
@@ -160,11 +194,20 @@ final class MCEmojiPickerView: UIView {
     }
     
     private func setupCollectionViewLayout() {
+        addSubview(searchBar)
         addSubview(collectionView)
+        
         NSLayoutConstraint.activate([
+            // Search bar constraints
+            searchBar.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.searchBarInsets.left),
+            searchBar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.searchBarInsets.right),
+            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: safeAreaInsets.top + Constants.searchBarInsets.top),
+            searchBar.heightAnchor.constraint(equalToConstant: Constants.searchBarHeight),
+            
+            // Collection view constraints
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
-            collectionView.topAnchor.constraint(equalTo: topAnchor, constant: safeAreaInsets.top),
+            collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             collectionView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -safeAreaInsets.bottom)
         ])
     }
@@ -425,5 +468,30 @@ extension MCEmojiPickerView: MCEmojiSkinTonePickerDelegate {
     
     func didEmojiSkinTonePickerDismissed() {
         toggleCollectionScrollAbility(isEnabled: true)
+    }
+}
+
+// MARK: - UISearchBarDelegate
+
+extension MCEmojiPickerView: UISearchBarDelegate {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        delegate?.didUpdateSearchText(searchText)
+    }
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        delegate?.didChangeSearchState(true)
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        if searchBar.text?.isEmpty == true {
+            delegate?.didChangeSearchState(false)
+        }
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
+        delegate?.didUpdateSearchText("")
+        delegate?.didChangeSearchState(false)
     }
 }

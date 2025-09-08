@@ -3,14 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		86BF31942E6F33E500665E80 /* MCEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 86BF31932E6F33E500665E80 /* MCEmojiPicker */; };
 		C44B58B529867F5E006478D5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44B58B429867F5E006478D5 /* AppDelegate.swift */; };
 		C44B58B929867F5E006478D5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44B58B829867F5E006478D5 /* ViewController.swift */; };
 		C44B58BE29867F5F006478D5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C44B58BD29867F5F006478D5 /* Assets.xcassets */; };
-		C44B58C729867F66006478D5 /* MCEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = C44B58C629867F66006478D5 /* MCEmojiPicker */; };
 		C49629B329873E2F0070BE66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C49629B529873E2F0070BE66 /* Localizable.strings */; };
 		C49629BC298744EE0070BE66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C49629BA298744EE0070BE66 /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
@@ -70,7 +70,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C44B58C729867F66006478D5 /* MCEmojiPicker in Frameworks */,
+				86BF31942E6F33E500665E80 /* MCEmojiPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,7 +172,7 @@
 			);
 			name = "iOS Example App";
 			packageProductDependencies = (
-				C44B58C629867F66006478D5 /* MCEmojiPicker */,
+				86BF31932E6F33E500665E80 /* MCEmojiPicker */,
 			);
 			productName = "iOS Example App";
 			productReference = C44B58B229867F5E006478D5 /* iOS Example App.app */;
@@ -241,6 +241,9 @@
 				vi,
 			);
 			mainGroup = C44B588929867DCB006478D5;
+			packageReferences = (
+				86BF31922E6F33E500665E80 /* XCLocalSwiftPackageReference "../../MCEmojiPicker" */,
+			);
 			productRefGroup = C44B589329867DCB006478D5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -533,8 +536,15 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		86BF31922E6F33E500665E80 /* XCLocalSwiftPackageReference "../../MCEmojiPicker" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../MCEmojiPicker;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
-		C44B58C629867F66006478D5 /* MCEmojiPicker */ = {
+		86BF31932E6F33E500665E80 /* MCEmojiPicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MCEmojiPicker;
 		};
