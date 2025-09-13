@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		86AC1BFB2E76056E00A24608 /* MCEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 86AC1BFA2E76056E00A24608 /* MCEmojiPicker */; };
 		86BF31942E6F33E500665E80 /* MCEmojiPicker in Frameworks */ = {isa = PBXBuildFile; productRef = 86BF31932E6F33E500665E80 /* MCEmojiPicker */; };
 		C44B58B529867F5E006478D5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44B58B429867F5E006478D5 /* AppDelegate.swift */; };
 		C44B58B929867F5E006478D5 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C44B58B829867F5E006478D5 /* ViewController.swift */; };
@@ -71,6 +72,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				86BF31942E6F33E500665E80 /* MCEmojiPicker in Frameworks */,
+				86AC1BFB2E76056E00A24608 /* MCEmojiPicker in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,6 +175,7 @@
 			name = "iOS Example App";
 			packageProductDependencies = (
 				86BF31932E6F33E500665E80 /* MCEmojiPicker */,
+				86AC1BFA2E76056E00A24608 /* MCEmojiPicker */,
 			);
 			productName = "iOS Example App";
 			productReference = C44B58B229867F5E006478D5 /* iOS Example App.app */;
@@ -242,7 +245,7 @@
 			);
 			mainGroup = C44B588929867DCB006478D5;
 			packageReferences = (
-				86BF31922E6F33E500665E80 /* XCLocalSwiftPackageReference "../../MCEmojiPicker" */,
+				86AC1BF92E76056E00A24608 /* XCLocalSwiftPackageReference "../../MCEmojiPicker" */,
 			);
 			productRefGroup = C44B589329867DCB006478D5 /* Products */;
 			projectDirPath = "";
@@ -460,7 +463,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = CZK6G8XHN8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS Example App/Resources/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MCEmojiPicker;
@@ -490,7 +493,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = CZK6G8XHN8;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS Example App/Resources/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MCEmojiPicker;
@@ -537,13 +540,17 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		86BF31922E6F33E500665E80 /* XCLocalSwiftPackageReference "../../MCEmojiPicker" */ = {
+		86AC1BF92E76056E00A24608 /* XCLocalSwiftPackageReference "../../MCEmojiPicker" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../MCEmojiPicker;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		86AC1BFA2E76056E00A24608 /* MCEmojiPicker */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = MCEmojiPicker;
+		};
 		86BF31932E6F33E500665E80 /* MCEmojiPicker */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = MCEmojiPicker;

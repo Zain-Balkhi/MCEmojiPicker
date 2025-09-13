@@ -37,7 +37,7 @@ class ViewController: UIViewController {
         } else {
             button.backgroundColor = UIColor(red: 209.0, green: 209.0, blue: 214.0, alpha: 1.0)
         }
-        button.setTitle("🙋🏻‍♂️", for: .normal)
+        button.setTitle("👌🏽", for: .normal)
         button.titleLabel?.font = UIFont.systemFont(ofSize: 65)
         button.addTarget(self, action: #selector(emojiButtonAction(_:)), for: .touchUpInside)
         button.addGestureRecognizer(

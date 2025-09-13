@@ -116,10 +116,30 @@ final class MCEmojiPickerViewModel: MCEmojiPickerViewModelProtocol {
     }
     
     public func updateEmojiSkinTone(_ skinToneRawValue: Int, in indexPath: IndexPath) -> MCEmoji {
-        let categoryType: MCEmojiCategoryType = emojiCategories[indexPath.section].type
-        let allCategoriesIndex: Int = allEmojiCategories.firstIndex { $0.type == categoryType } ?? 0
-        allEmojiCategories[allCategoriesIndex].emojis[indexPath.row].set(skinToneRawValue: skinToneRawValue)
-        return allEmojiCategories[allCategoriesIndex].emojis[indexPath.row]
+        let emoji = emojiCategories[indexPath.section].emojis[indexPath.row]
+        
+        // If we're in search mode, we need to find the original emoji in allEmojiCategories
+        if isSearching.value {
+            // Find the original emoji by matching emojiKeys (which uniquely identify each emoji)
+            for categoryIndex in 0..<allEmojiCategories.count {
+                for emojiIndex in 0..<allEmojiCategories[categoryIndex].emojis.count {
+                    if allEmojiCategories[categoryIndex].emojis[emojiIndex].emojiKeys == emoji.emojiKeys {
+                        allEmojiCategories[categoryIndex].emojis[emojiIndex].set(skinToneRawValue: skinToneRawValue)
+                        return allEmojiCategories[categoryIndex].emojis[emojiIndex]
+                    }
+                }
+            }
+        } else {
+            // Normal mode - use the original logic
+            let categoryType: MCEmojiCategoryType = emojiCategories[indexPath.section].type
+            let allCategoriesIndex: Int = allEmojiCategories.firstIndex { $0.type == categoryType } ?? 0
+            allEmojiCategories[allCategoriesIndex].emojis[indexPath.row].set(skinToneRawValue: skinToneRawValue)
+            return allEmojiCategories[allCategoriesIndex].emojis[indexPath.row]
+        }
+        
+        // Fallback - update the emoji directly and return it
+        emoji.set(skinToneRawValue: skinToneRawValue)
+        return emoji
     }
     
     public func updateSearchText(_ text: String) {
