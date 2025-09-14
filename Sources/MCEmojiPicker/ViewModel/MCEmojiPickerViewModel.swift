@@ -32,10 +32,8 @@ protocol MCEmojiPickerViewModelProtocol {
     var selectedEmoji: Observable<MCEmoji?> { get set }
     /// The observed variable that is responsible for the choice of emoji category.
     var selectedEmojiCategoryIndex: Observable<Int> { get set }
-    /// The observed variable that is responsible for the search text.
+    /// The search text used to filter emojis.
     var searchText: Observable<String> { get set }
-    /// Whether the picker is currently in search mode.
-    var isSearching: Observable<Bool> { get set }
     /// Clears the selected emoji, setting to `nil`.
     func clearSelectedEmoji()
     /// Returns the number of categories with emojis.
@@ -48,9 +46,9 @@ protocol MCEmojiPickerViewModelProtocol {
     func sectionHeaderName(for section: Int) -> String
     /// Updates the emoji skin tone and returns the updated `MCEmoji`.
     func updateEmojiSkinTone(_ skinToneRawValue: Int, in indexPath: IndexPath) -> MCEmoji
-    /// Updates the search text and filters emojis accordingly.
+    /// Updates the search text and filters emojis.
     func updateSearchText(_ text: String)
-    /// Clears the search and returns to normal category view.
+    /// Clears the search text and shows all emojis.
     func clearSearch()
 }
 
@@ -62,22 +60,21 @@ final class MCEmojiPickerViewModel: MCEmojiPickerViewModelProtocol {
     public var selectedEmoji = Observable<MCEmoji?>(value: nil)
     public var selectedEmojiCategoryIndex = Observable<Int>(value: 0)
     public var searchText = Observable<String>(value: "")
-    public var isSearching = Observable<Bool>(value: false)
     public var showEmptyEmojiCategories = false
     public var emojiCategories: [MCEmojiCategory] {
-        if isSearching.value {
-            return searchResults
-        } else {
-            return allEmojiCategories.filter({ showEmptyEmojiCategories || $0.emojis.count > 0 })
+        let categories = allEmojiCategories.filter({ showEmptyEmojiCategories || $0.emojis.count > 0 })
+        
+        guard !searchText.value.isEmpty else {
+            return categories
         }
+        
+        return filterCategoriesBySearchText(categories, searchText: searchText.value)
     }
     
     // MARK: - Private Properties
     
     /// All emoji categories.
     private var allEmojiCategories = [MCEmojiCategory]()
-    /// Search results when searching.
-    private var searchResults = [MCEmojiCategory]()
     
     // MARK: - Initializers
     
@@ -108,18 +105,14 @@ final class MCEmojiPickerViewModel: MCEmojiPickerViewModelProtocol {
     }
     
     public func sectionHeaderName(for section: Int) -> String {
-        if isSearching.value {
-            return "Search Results"
-        } else {
-            return emojiCategories[section].categoryName
-        }
+        return emojiCategories[section].categoryName
     }
     
     public func updateEmojiSkinTone(_ skinToneRawValue: Int, in indexPath: IndexPath) -> MCEmoji {
         let emoji = emojiCategories[indexPath.section].emojis[indexPath.row]
         
         // If we're in search mode, we need to find the original emoji in allEmojiCategories
-        if isSearching.value {
+        if !searchText.value.isEmpty {
             // Find the original emoji by matching emojiKeys (which uniquely identify each emoji)
             for categoryIndex in 0..<allEmojiCategories.count {
                 for emojiIndex in 0..<allEmojiCategories[categoryIndex].emojis.count {
@@ -144,46 +137,23 @@ final class MCEmojiPickerViewModel: MCEmojiPickerViewModelProtocol {
     
     public func updateSearchText(_ text: String) {
         searchText.value = text
-        isSearching.value = !text.isEmpty
-        
-        if text.isEmpty {
-            searchResults = []
-        } else {
-            performSearch(with: text)
-        }
     }
     
     public func clearSearch() {
         searchText.value = ""
-        isSearching.value = false
-        searchResults = []
     }
     
     // MARK: - Private Methods
     
-    private func performSearch(with text: String) {
-        let searchTerm = text.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+    private func filterCategoriesBySearchText(_ categories: [MCEmojiCategory], searchText: String) -> [MCEmojiCategory] {
+        let lowercasedSearchText = searchText.lowercased()
         
-        var allMatchingEmojis: [MCEmoji] = []
-        
-        // Search through all emoji categories
-        for category in allEmojiCategories {
-            for emoji in category.emojis {
-                if emoji.searchKey.lowercased().contains(searchTerm) {
-                    allMatchingEmojis.append(emoji)
-                }
-            }
-        }
-        
-        // Create a single search results category
-        if !allMatchingEmojis.isEmpty {
-            let searchCategory = MCEmojiCategory(
-                type: .frequentlyUsed, // Use frequentlyUsed as a generic type for search results
-                emojis: allMatchingEmojis
-            )
-            searchResults = [searchCategory]
-        } else {
-            searchResults = []
+        return categories.compactMap { category in
+            let filteredEmojis = category.emojis.filter { $0.searchKey.lowercased().contains(lowercasedSearchText) }
+            guard !filteredEmojis.isEmpty else { return nil }
+            var filteredCategory = category
+            filteredCategory.emojis = filteredEmojis
+            return filteredCategory
         }
     }
 }

@@ -37,10 +37,8 @@ protocol MCEmojiPickerViewDelegate: AnyObject {
     func getEmojiPickerFrame() -> CGRect
     func updateEmojiSkinTone(_ skinToneRawValue: Int, in indexPath: IndexPath)
     func feedbackImpactOccurred()
-    /// Handles search text changes.
-    func didUpdateSearchText(_ text: String)
-    /// Handles search state changes.
-    func didChangeSearchState(_ isSearching: Bool)
+    func didSearchTextChange(_ searchText: String)
+    func clearSearch()
 }
 
 final class MCEmojiPickerView: UIView {
@@ -68,8 +66,8 @@ final class MCEmojiPickerView: UIView {
             dark: UIColor(red: 0.22, green: 0.22, blue: 0.23, alpha: 1.0)
         )
         
+        static let searchBarTopPadding = 8.0
         static let searchBarHeight = 44.0
-        static let searchBarInsets = UIEdgeInsets(top: 8, left: 16, bottom: 8, right: 16)
     }
     
     // MARK: - Private Properties
@@ -107,11 +105,9 @@ final class MCEmojiPickerView: UIView {
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.translatesAutoresizingMaskIntoConstraints = false
-        searchBar.placeholder = "Search emojis"
+        searchBar.placeholder = "Search emojis..."
         searchBar.searchBarStyle = .minimal
         searchBar.backgroundColor = .clear
-        searchBar.backgroundImage = UIImage()
-        searchBar.tintColor = .systemBlue
         return searchBar
     }()
     
@@ -145,6 +141,7 @@ final class MCEmojiPickerView: UIView {
     override func draw(_ rect: CGRect) {
         super.draw(rect)
         setupCategoryViews()
+        setupSearchBarLayout()
         setupCollectionViewLayout()
         setupCollectionViewBottomInsets()
         setupCategoriesControlLayout()
@@ -161,19 +158,9 @@ final class MCEmojiPickerView: UIView {
         })
     }
     
-    /// Updates the search state and shows/hides category controls accordingly.
-    ///
-    /// - Parameter isSearching: Whether the picker is in search mode.
-    public func updateSearchState(_ isSearching: Bool) {
-        categoriesStackView.isHidden = isSearching
+    /// Reloads the collection view data.
+    public func reloadData() {
         collectionView.reloadData()
-    }
-    
-    /// Updates the search text in the search bar.
-    ///
-    /// - Parameter text: The search text to display.
-    public func updateSearchText(_ text: String) {
-        searchBar.text = text
     }
     
     // MARK: - Private Methods
@@ -193,18 +180,19 @@ final class MCEmojiPickerView: UIView {
         collectionView.verticalScrollIndicatorInsets.bottom = categoriesStackViewHeight
     }
     
-    private func setupCollectionViewLayout() {
+    private func setupSearchBarLayout() {
         addSubview(searchBar)
-        addSubview(collectionView)
-        
         NSLayoutConstraint.activate([
-            // Search bar constraints
-            searchBar.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Constants.searchBarInsets.left),
-            searchBar.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Constants.searchBarInsets.right),
-            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: safeAreaInsets.top + Constants.searchBarInsets.top),
-            searchBar.heightAnchor.constraint(equalToConstant: Constants.searchBarHeight),
-            
-            // Collection view constraints
+            searchBar.leadingAnchor.constraint(equalTo: leadingAnchor),
+            searchBar.trailingAnchor.constraint(equalTo: trailingAnchor),
+            searchBar.topAnchor.constraint(equalTo: topAnchor, constant: safeAreaInsets.top + Constants.searchBarTopPadding),
+            searchBar.heightAnchor.constraint(equalToConstant: Constants.searchBarHeight)
+        ])
+    }
+    
+    private func setupCollectionViewLayout() {
+        addSubview(collectionView)
+        NSLayoutConstraint.activate([
             collectionView.leadingAnchor.constraint(equalTo: leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: trailingAnchor),
             collectionView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
@@ -475,23 +463,16 @@ extension MCEmojiPickerView: MCEmojiSkinTonePickerDelegate {
 
 extension MCEmojiPickerView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        delegate?.didUpdateSearchText(searchText)
+        delegate?.didSearchTextChange(searchText)
     }
     
-    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        delegate?.didChangeSearchState(true)
-    }
-    
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        if searchBar.text?.isEmpty == true {
-            delegate?.didChangeSearchState(false)
-        }
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         searchBar.text = ""
         searchBar.resignFirstResponder()
-        delegate?.didUpdateSearchText("")
-        delegate?.didChangeSearchState(false)
+        delegate?.clearSearch()
     }
 }
